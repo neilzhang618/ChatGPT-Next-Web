@@ -75,6 +75,7 @@ import {
   List,
   ListItem,
   Modal,
+  Select,
   Selector,
   showConfirm,
   showPrompt,
@@ -654,6 +655,7 @@ function _Chat() {
   const session = chatStore.currentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
+  const updateConfig = config.update;
 
   const [showExport, setShowExport] = useState(false);
 
@@ -1100,11 +1102,13 @@ function _Chat() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const currentModel = chatStore.currentSession().mask.modelConfig.model;
-      if(!isVisionModel(currentModel)){return;}
+      if (!isVisionModel(currentModel)) {
+        return;
+      }
       const items = (event.clipboardData || window.clipboardData).items;
       for (const item of items) {
         if (item.kind === "file" && item.type.startsWith("image/")) {
@@ -1204,14 +1208,33 @@ function _Chat() {
         )}
 
         <div className={`window-header-title ${styles["chat-body-title"]}`}>
-          <div
-            className={`window-header-main-title ${styles["chat-body-main-title"]}`}
-            onClickCapture={() => setIsEditingMessage(true)}
-          >
-            {!session.topic ? DEFAULT_TOPIC : session.topic}
+          <div>
+            <div
+              className={`window-header-main-title ${styles["chat-body-main-title"]}`}
+              onClickCapture={() => setIsEditingMessage(true)}
+            >
+              {!session.topic ? DEFAULT_TOPIC : session.topic}
+            </div>
+            <div className="window-header-sub-title">
+              {Locale.Chat.SubTitle(session.messages.length)}
+            </div>
           </div>
-          <div className="window-header-sub-title">
-            {Locale.Chat.SubTitle(session.messages.length)}
+          <div className="model-select" style={{ marginLeft: "8px" }}>
+            <Select
+              value={config.modelConfig.model}
+              onChange={(e) => {
+                updateConfig(
+                  (config) =>
+                    (config.modelConfig.model = e.target.value as any),
+                );
+              }}
+            >
+              {["gpt-35-turbo", "gpt-4", "gpt-4-32k"].map((v) => (
+                <option value={v} key={v}>
+                  {v}
+                </option>
+              ))}
+            </Select>
           </div>
         </div>
         <div className="window-actions">

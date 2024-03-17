@@ -33,6 +33,7 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true,
   },
+  basePath: '/chat-next',
 };
 
 const CorsHeaders = [

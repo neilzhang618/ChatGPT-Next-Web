@@ -55,17 +55,6 @@ export async function requestOpenai(req: NextRequest) {
     10 * 60 * 1000,
   );
 
-  if (serverConfig.isAzure) {
-    if (!serverConfig.azureApiVersion) {
-      return NextResponse.json({
-        error: true,
-        message: `missing AZURE_API_VERSION in server env vars`,
-      });
-    }
-    path = makeAzurePath(path, serverConfig.azureApiVersion);
-  }
-
-  const fetchUrl = `${baseUrl}/${path}`;
   const fetchOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
@@ -84,6 +73,26 @@ export async function requestOpenai(req: NextRequest) {
     signal: controller.signal,
   };
 
+  const clonedBody = await (req.body ? req.text() : "{}");
+  fetchOptions.body = clonedBody;
+  const jsonBody = JSON.parse(clonedBody) as { model?: string };
+
+  if (serverConfig.isAzure) {
+    if (!serverConfig.azureApiVersion) {
+      return NextResponse.json({
+        error: true,
+        message: `missing AZURE_API_VERSION in server env vars`,
+      });
+    }
+    const deploymentName =
+      jsonBody?.model === "gpt-3.5-turbo"
+        ? "gpt-35-turbo"
+        : jsonBody?.model ?? "unknown";
+    path = makeAzurePath(path, deploymentName, serverConfig.azureApiVersion);
+  }
+
+  const fetchUrl = `${baseUrl}/${path}`;
+
   // #1815 try to refuse gpt4 request
   if (serverConfig.customModels && req.body) {
     try {
@@ -91,10 +100,10 @@ export async function requestOpenai(req: NextRequest) {
         DEFAULT_MODELS,
         serverConfig.customModels,
       );
-      const clonedBody = await req.text();
-      fetchOptions.body = clonedBody;
+      // const clonedBody = await req.text();
+      // fetchOptions.body = clonedBody;
 
-      const jsonBody = JSON.parse(clonedBody) as { model?: string };
+      // const jsonBody = JSON.parse(clonedBody) as { model?: string };
 
       // not undefined and is false
       if (modelTable[jsonBody?.model ?? ""].available === false) {
@@ -114,7 +123,11 @@ export async function requestOpenai(req: NextRequest) {
   }
 
   try {
+    console.log("---------------------");
+    console.log(fetchUrl, fetchOptions);
     const res = await fetch(fetchUrl, fetchOptions);
+    // console.log("=============")
+    // console.log(await res.text())
 
     // to prevent browser prompt for credentials
     const newHeaders = new Headers(res.headers);

@@ -1,9 +1,8 @@
-export function makeAzurePath(path: string, apiVersion: string) {
-  // should omit /v1 prefix
-  path = path.replaceAll("v1/", "");
-
-  // should add api-key to query string
-  path += `${path.includes("?") ? "&" : "?"}api-version=${apiVersion}`;
-
-  return path;
+export function makeAzurePath(
+  path: string,
+  deploymentName: string,
+  apiVersion: string,
+) {
+  // const fullPath = ${AZURE_OPENAI_BASE}openai/deployments/gpt-35-turbo/chat/completions?api-version=2024-02-15-preview
+  return `openai/deployments/${deploymentName}/chat/completions?api-version=${apiVersion}`;
 }

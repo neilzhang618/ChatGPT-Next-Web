@@ -70,9 +70,13 @@ export function ListItem(props: {
   );
 }
 
-export function List(props: { children: React.ReactNode; id?: string }) {
+export function List(props: {
+  children: React.ReactNode;
+  id?: string;
+  style?: React.CSSProperties;
+}) {
   return (
-    <div className={styles.list} id={props.id}>
+    <div className={styles.list} id={props.id} style={props.style}>
       {props.children}
     </div>
   );

@@ -71,7 +71,7 @@ export class ChatGPTApi implements LLMApi {
     }
 
     if (isAzure) {
-      path = makeAzurePath(path, accessStore.azureApiVersion);
+      path = makeAzurePath(path, "unknown", accessStore.azureApiVersion);
     }
 
     console.log("[Proxy Endpoint] ", baseUrl, path);
@@ -90,11 +90,12 @@ export class ChatGPTApi implements LLMApi {
       content: visionModel ? v.content : getMessageTextContent(v),
     }));
 
+    const appModelConfig = useAppConfig.getState().modelConfig;
     const modelConfig = {
-      ...useAppConfig.getState().modelConfig,
+      ...appModelConfig,
       ...useChatStore.getState().currentSession().mask.modelConfig,
       ...{
-        model: options.config.model,
+        model: appModelConfig.model, // force overwrite model from the global app config
       },
     };
 
