@@ -123,8 +123,8 @@ export async function requestOpenai(req: NextRequest) {
   }
 
   try {
-    console.log("---------------------");
-    console.log(fetchUrl, fetchOptions);
+    // console.log("---------------------");
+    // console.log(fetchUrl, fetchOptions);
     const res = await fetch(fetchUrl, fetchOptions);
     // console.log("=============")
     // console.log(await res.text())
