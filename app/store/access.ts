@@ -1,6 +1,7 @@
 import {
   ApiPath,
   DEFAULT_API_HOST,
+  ROOT_BASE_URL_PREFIX,
   ServiceProvider,
   StoreKey,
 } from "../constant";
@@ -82,7 +83,7 @@ export const useAccessStore = createPersistStore(
     fetch() {
       if (fetchState > 0 || getClientConfig()?.buildMode === "export") return;
       fetchState = 1;
-      fetch("/api/config", {
+      fetch(ROOT_BASE_URL_PREFIX + "/api/config", {
         method: "post",
         body: null,
         headers: {

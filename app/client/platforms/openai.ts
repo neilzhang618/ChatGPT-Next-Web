@@ -5,6 +5,7 @@ import {
   DEFAULT_MODELS,
   OpenaiPath,
   REQUEST_TIMEOUT_MS,
+  ROOT_BASE_URL_PREFIX,
   ServiceProvider,
 } from "@/app/constant";
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
@@ -76,7 +77,7 @@ export class ChatGPTApi implements LLMApi {
 
     console.log("[Proxy Endpoint] ", baseUrl, path);
 
-    return [baseUrl, path].join("/");
+    return ROOT_BASE_URL_PREFIX + [baseUrl, path].join("/");
   }
 
   extractMessage(res: any) {
@@ -208,7 +209,8 @@ export class ChatGPTApi implements LLMApi {
               } catch {}
 
               if (res.status === 401) {
-                responseTexts.push(Locale.Error.Unauthorized);
+                // responseTexts.push(Locale.Error.Unauthorized);
+                // noop
               }
 
               if (extraInfo) {

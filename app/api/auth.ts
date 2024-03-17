@@ -24,8 +24,34 @@ function parseApiKey(bearToken: string) {
   };
 }
 
-export function auth(req: NextRequest, modelProvider: ModelProvider) {
+async function verifyUser(authorization: string) {
+  try {
+    const res = await fetch("http://localhost:8080/user", {
+      headers: {
+        cookie: `authorization=${authorization}`,
+      },
+    });
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
+export async function auth(req: NextRequest, modelProvider: ModelProvider) {
   const authToken = req.headers.get("Authorization") ?? "";
+
+  const authorization = req.cookies.get("authorization")?.value ?? "";
+
+  const userInfo = await verifyUser(authorization);
+  console.log("userInfo", userInfo);
+
+  if (!userInfo) {
+    return {
+      error: true,
+      msg: "invalid authorization",
+    };
+  }
 
   // check if it is openai api key or user token
   const { accessCode, apiKey } = parseApiKey(authToken);

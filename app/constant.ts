@@ -13,6 +13,9 @@ export const OPENAI_BASE_URL = "https://api.openai.com";
 
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 
+// export const ROOT_BASE_URL_PREFIX=""  // for dev
+export const ROOT_BASE_URL_PREFIX = "/chat-next"; // for prod
+
 export enum Path {
   Home = "/",
   Chat = "/chat",
